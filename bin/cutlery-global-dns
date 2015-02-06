@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+	echo "Which interface should be used?"
+	exit 42
+fi
+
+#CONSUL_CID="docker_consul_1"
+
+#IP=$(docker inspect --format '{{ .NetworkSettings.IPAddress }}' $CONSUL_CID)
+
+#IP=$(ifconfig | grep docker0 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+IP=$(ifconfig | grep $1 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+
+sed -i '/DOCKER_OPTS/d' /etc/default/docker
+#echo "DOCKER_OPTS=\"--dns $IP --dns 8.8.8.8 --dns-search service.consul\"" >> /etc/default/docker
+echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock --dns $IP --dns-search service.consul\"" >> /etc/default/docker
+
+service docker reload

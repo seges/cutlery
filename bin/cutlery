@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# just a router...
+
+if [ $# -lt 1 ]; then
+	echo "$(basename $0) command"
+	echo ""
+	echo "command One of ambassador, discovery, global-dns"
+	exit 42
+fi
+
+cmd=$1
+shift
+
+if [ "$CUTLERY_HOME" == "" ]; then
+	CUTLERY_HOME="/usr/local/cutlery"
+fi
+
+if [ "$cmd" == "global-dns" ]; then
+	sudo="sudo"
+else
+	sudo=""
+fi
+
+$sudo $CUTLERY_HOME/bin/cutlery-$cmd $@
+

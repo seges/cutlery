@@ -1,0 +1,67 @@
+#!/bin/bash
+
+function start
+{
+  IFACE="docker0"
+  BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+  CONSUL_RUNLIST=$@
+
+  echo "Starting... $CONSUL_RUNLIST, dns @ $BRIDGE_IP"
+
+  docker run -d \
+    --name consul \
+    -p 8300:8300 \
+    -p 8301:8301 \
+    -p 8301:8301/udp \
+    -p 8302:8302 \
+    -p 8302:8302/udp \
+    -p 8400:8400 \
+    -p 8500:8500 \
+    -p $BRIDGE_IP:53:53/udp \
+    -h $HOSTNAME \
+    -v /data \
+    -t progrium/consul \
+    -server $CONSUL_RUNLIST
+
+  docker run -d \
+    --name registrator \
+    -v /var/run/docker.sock:/tmp/docker.sock \
+    -h $HOSTNAME \
+    --link="consul:consul" \
+    -t progrium/registrator \
+    consul://consul:8500
+}
+
+function stop
+{
+	echo "Removing consul data"
+	docker stop registrator
+	docker stop consul
+	
+	docker rm registrator
+	docker rm consul
+}
+
+if [ $# -lt 1 ]; then
+  echo "$(basename $0) <start|stop|restart> [<consul parameters>]"
+  exit 42
+fi
+
+
+COMMAND="$1"
+shift
+
+case $COMMAND in
+start)
+	start $@
+	;;
+stop)
+	stop
+	;;
+restart)
+	stop
+	start $@
+	;;
+esac	
+
+
