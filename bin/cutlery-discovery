@@ -35,10 +35,15 @@ function start
 function stop
 {
 	echo "Removing consul data"
+	read -t 1
 	docker stop registrator
+	read -t 1
 	docker stop consul
-	
+
+	echo "Removing containers"	
+	read -t 1
 	docker rm registrator
+	read -t 1
 	docker rm consul
 }
 
