@@ -3,21 +3,27 @@
 
 function stop
 {
+  echo "[stop] ambassador"
   docker stop ambassador
+  echo "[rm] ambassador"
   docker rm ambassador
 
+  echo "[stop] ambassador iptables"
   docker stop ambassadoriptables
+  echo "[rm] ambassador iptables"
   docker rm ambassadoriptables
 }
 
 function start
 {
+  echo "[start] ambassador $ambassador_name"
   docker run -d \
     --name $ambassador_name \
     -v /var/run/docker.sock:/var/run/docker.sock \
     -t progrium/ambassadord \
     --omnimode
 
+  echo "[start] ambassador iptables"
   docker run -d \
     --name ambassadoriptables \
     -v /var/run/docker.sock:/var/run/docker.sock \
