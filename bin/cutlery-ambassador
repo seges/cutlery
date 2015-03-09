@@ -8,6 +8,11 @@ function stop
   echo "[rm] ambassador"
   docker rm ambassador
 
+  iptables_stop
+}
+
+function iptables_stop
+{
   echo "[stop] ambassador iptables"
   docker stop ambassadoriptables
   echo "[rm] ambassador iptables"
@@ -23,6 +28,11 @@ function start
     -t progrium/ambassadord \
     --omnimode
 
+  iptables_start
+}
+
+function iptables_start
+{
   echo "[start] ambassador iptables"
   docker run -d \
     --name ambassadoriptables \
@@ -34,7 +44,7 @@ function start
 }
 
 if [ $# -lt 1 ]; then
-  echo "$(basename $0) <start|stop|restart> [ambassador_name]"
+  echo "$(basename $0) <start|stop|restart|iptables> [ambassador_name]"
   echo "ambassador_name What name should be used for the Ambassador container"
   exit 42
 fi
@@ -58,6 +68,10 @@ stop)
 restart)
   stop
   start
+  ;;
+iptables)
+  iptables_stop
+  iptables_start
   ;;
 esac
 
