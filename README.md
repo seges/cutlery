@@ -19,3 +19,18 @@ curl https://raw.githubusercontent.com/seges/cutlery/master/setup.sh | sudo sh
 ```
 cutlery
 ```
+
+## Ambassador
+
+Prepares Ambassador connected to Consul discovery.
+
+## Discovery
+
+Prepares Consul with Registrator to support Docker service discovery. It has possibility to register DNSmasq entry to redirect all requests from host pointing to 'service.consul' domain to running Consul.
+
+## Global DNS
+
+Sets default DNS for Docker containers.
+
+(!) *Beware it restarts Docker*
+
