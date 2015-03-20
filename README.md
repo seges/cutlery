@@ -11,7 +11,7 @@ Set of tools to help to work with Docker, orchestration, service discovery, etc.
 # Install
 
 ```
-curl https://raw.githubusercontent.com/seges/cutlery/master/setup.sh | sudo sh
+curl -L https://github.com/seges/cutlery/raw/master/setup.sh | sudo sh
 ```
 
 # Run
