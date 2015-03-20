@@ -36,7 +36,17 @@
 
 <p><img src="images/logo.png" alt="alt text" title="cutlery"></p>
 
-<p>Set of tools to help to work with Docker, orchestration, service discovery, etc...</p>
+<p>Set of tools to help to work with Docker, orchestration, service discovery, etc... suitable to be installed on server but as well on developer's machine.</p>
+
+<p>Cutlery is capable of preparing following scenario:</p>
+
+<ul>
+<li>start <a href="http://www.consul.io">Consul</a> and <a href="https://github.com/gliderlabs/registrator">Registrator</a> container on the host responsible for Service discovery, DNS resolution of registered services and containers, automated container registration and service lookup</li>
+<li>set up host's DNS resolution of Consul-registered services</li>
+<li>set up central <a href="https://github.com/progrium/ambassadord">Ambassador</a> responsible for transparently calling services among containers utilizing Consul</li>
+</ul>
+
+<p>It is minimal and sufficient set of containers to allow transparent service discovery independent of your environment.</p>
 
 <h1>
 <a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements</h1>
@@ -48,13 +58,77 @@
 <h1>
 <a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h1>
 
-<pre><code>curl https://github.com/seges/cutlery/raw/master/setup.sh | sudo sh
+<pre><code>curl -L https://github.com/seges/cutlery/raw/master/setup.sh | sudo sh
 </code></pre>
 
 <h1>
 <a id="run" class="anchor" href="#run" aria-hidden="true"><span class="octicon octicon-link"></span></a>Run</h1>
 
-<pre><code>cutlery
+<pre><code>cutlery &lt;command&gt;
+</code></pre>
+
+<h2>
+<a id="ambassador" class="anchor" href="#ambassador" aria-hidden="true"><span class="octicon octicon-link"></span></a>Ambassador</h2>
+
+<pre><code>cutlery ambassador
+</code></pre>
+
+<p>Prepares Ambassador connected to Consul discovery. You can have more ambassadors running at once if you specify different names.</p>
+
+<p>If you need to connect two services, e.g. web to database, you need an ambassador container running and:</p>
+
+<ul>
+<li>database containing environment variable <code>SERVICE_NAME</code> or <code>SERVICE_&lt;exposed port&gt;_NAME</code> definitions in order to register it in Consul, e.g. <code>SERVICE_5555_NAME=db</code> and publishing port <code>-p 5555</code> (there is no need to specify exact port)</li>
+<li>web containing environment variable <code>BACKEND_&lt;local port&gt;</code>, e.g. <code>BACKEND_5432=db.service.consul</code> and link to ambassador - <code>--link="ambassador:backends"</code>
+</li>
+</ul>
+
+<p>In this scenario, you point all database connections within web container to <code>backends:5432</code> and Ambassador container ensures proxying of the request to database container with proper port resolution, because it discovers it from Consul service entry for <code>db.service.consul</code> - the IP and port. Thus you don't need to explicitly bind ports to host and keep the scalability at maximum level.</p>
+
+<p>Link alias <code>backends</code> is automatically added to container's <code>/etc/hosts</code> with the IP of Ambassador to handle the proxying.</p>
+
+<h2>
+<a id="discovery" class="anchor" href="#discovery" aria-hidden="true"><span class="octicon octicon-link"></span></a>Discovery</h2>
+
+<pre><code>cutlery discovery
+</code></pre>
+
+<p>Prepares Consul with Registrator to support Docker service discovery. </p>
+
+<p>It has possibility to register DNSmasq entry to redirect all requests from host pointing to 'service.consul' domain to running Consul.</p>
+
+<p>If you want to start service discovery on the host with public IP 10.20.30.40 which is standalone (e.g. your development environment), execute:</p>
+
+<pre><code>cutlery discovery start "-advertise 10.20.30.40 -bootstrap"
+</code></pre>
+
+<p>You can provide usual Consul arguments and they will be passed to the container upon startup.</p>
+
+<p>Every container containing <code>SERVICE_NAME</code> or <code>SERVICE_&lt;exposed port&gt;_NAME</code> environment variables will be registered in Consul by Progrium's Registrator.</p>
+
+<h3>
+<a id="host-dns-resolution" class="anchor" href="#host-dns-resolution" aria-hidden="true"><span class="octicon octicon-link"></span></a>Host DNS resolution</h3>
+
+<p>There are situations (especially in development) when you want to access services from host which are registered in Consul by their appropriate DNS names (e.g. <code>db.service.consul</code>). You have the possibility to add an entry into your host's <code>/etc/hosts</code> file but that is cumbersome and might contain stale data after some time. In case you are using NetworkManager, Cutlery can register route to DNSmasq to resolve all <code>service.consul</code> domain names to Consul container.</p>
+
+<pre><code>cutlery discovery register
+</code></pre>
+
+<p>The command restarts networking in order to be applied.</p>
+
+<h2>
+<a id="global-dns" class="anchor" href="#global-dns" aria-hidden="true"><span class="octicon octicon-link"></span></a>Global DNS</h2>
+
+<pre><code>cutlery global-dns
+</code></pre>
+
+<p>Sets default DNS for Docker containers on the host.</p>
+
+<p>(!) <em>Beware it restarts Docker</em></p>
+
+<p>So for example if you want to register default DNS for containers that will be published on Docker's bridge IP, you execute:</p>
+
+<pre><code>cutlery global-dns docker0
 </code></pre>
       </section>
     </div>
@@ -63,7 +137,7 @@
     <div id="footer_wrap" class="outer">
       <footer class="inner">
         <p class="copyright">Cutlery maintained by <a href="https://github.com/seges">seges</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
 
