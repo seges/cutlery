@@ -1,8 +1,12 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-	echo "Which interface should be used?"
-	exit 42
+  echo "Usage: $(basename $0) interface
+
+        Replaces default Docker daemon configuration with default DNS pointing to Consul DNS.
+
+        interface - Which network interface should be used to assign default DNS to containers"
+  exit 42
 fi
 
 #CONSUL_CID="docker_consul_1"
@@ -12,8 +16,11 @@ fi
 #IP=$(ifconfig | grep docker0 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 IP=$(ifconfig | grep $1 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 
+echo "[setup] docker DNS = $IP"
+
 sed -i '/DOCKER_OPTS/d' /etc/default/docker
 #echo "DOCKER_OPTS=\"--dns $IP --dns 8.8.8.8 --dns-search service.consul\"" >> /etc/default/docker
 echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock --dns $IP --dns-search service.consul\"" >> /etc/default/docker
 
+echo "[reload] docker host"
 service docker reload

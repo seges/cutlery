@@ -6,7 +6,7 @@ function start
   BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
   CONSUL_RUNLIST=$@
 
-  echo "Starting... $CONSUL_RUNLIST, dns @ $BRIDGE_IP"
+  echo "[start] consul: $CONSUL_RUNLIST, dns @ $BRIDGE_IP"
 
   docker run -d \
     --name consul \
@@ -23,6 +23,7 @@ function start
     -t progrium/consul \
     -server $CONSUL_RUNLIST
 
+  echo "[start] registrator"
   docker run -d \
     --name registrator \
     -v /var/run/docker.sock:/tmp/docker.sock \
@@ -34,16 +35,38 @@ function start
 
 function stop
 {
-	echo "Removing consul data"
-	docker stop registrator
-	docker stop consul
-	
-	docker rm registrator
-	docker rm consul
+  echo "[stop] registrator"
+  read -t 1
+  docker stop registrator
+  echo "[stop] consul"
+  read -t 1
+  docker stop consul
+
+  echo "[rm] registrator"
+  read -t 1
+  docker rm registrator
+  echo "[rm] consul"
+  read -t 1
+  docker rm consul
+}
+
+function register
+{
+  IFACE="docker0"
+  BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+
+  sudo sh -c "echo 'server=/service.consul/$BRIDGE_IP' > /etc/NetworkManager/dnsmasq.d/cutlery-consul.conf"
+  sudo restart network-manager
+
 }
 
 if [ $# -lt 1 ]; then
-  echo "$(basename $0) <start|stop|restart> [<consul parameters>]"
+  echo "Usage: $(basename $0) <start|stop|restart|register> [<consul parameters>]
+
+       Controls Consul and Registrator containers.
+
+       start|stop|restart - control the containers
+       register - adds DNSmasq configuration to NetworkManager where all lookups to 'service.consul' domain are redirected to Consul container"
   exit 42
 fi
 
@@ -53,15 +76,17 @@ shift
 
 case $COMMAND in
 start)
-	start $@
-	;;
+  start $@
+  ;;
 stop)
-	stop
-	;;
+  stop
+  ;;
 restart)
-	stop
-	start $@
-	;;
+  stop
+  start $@
+  ;;
+register)
+  register
+  ;;
 esac	
-
 
