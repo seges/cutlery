@@ -1,8 +1,12 @@
 #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-	echo "Which interface should be used?"
-	exit 42
+  echo "Usage: $(basename $0) interface
+
+        Replaces default Docker daemon configuration with default DNS pointing to Consul DNS.
+
+        interface - Which network interface should be used to assign default DNS to containers"
+  exit 42
 fi
 
 #CONSUL_CID="docker_consul_1"

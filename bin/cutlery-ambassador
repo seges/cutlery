@@ -44,8 +44,9 @@ function iptables_start
 }
 
 if [ $# -lt 1 ]; then
-  echo "$(basename $0) <start|stop|restart|iptables> [ambassador_name]"
-  echo "ambassador_name What name should be used for the Ambassador container"
+  echo "Usage: $(basename $0) <start|stop|restart|iptables> [ambassador_name]
+
+        ambassador_name - What name should be used for the Ambassador container"
   exit 42
 fi
 

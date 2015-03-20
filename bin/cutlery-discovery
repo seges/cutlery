@@ -35,19 +35,19 @@ function start
 
 function stop
 {
-	echo "[stop] registrator"
-	read -t 1
-	docker stop registrator
-	echo "[stop] consul"
-	read -t 1
-	docker stop consul
+  echo "[stop] registrator"
+  read -t 1
+  docker stop registrator
+  echo "[stop] consul"
+  read -t 1
+  docker stop consul
 
-	echo "[rm] registrator"
-	read -t 1
-	docker rm registrator
-	echo "[rm] consul"
-	read -t 1
-	docker rm consul
+  echo "[rm] registrator"
+  read -t 1
+  docker rm registrator
+  echo "[rm] consul"
+  read -t 1
+  docker rm consul
 }
 
 function register
@@ -61,7 +61,12 @@ function register
 }
 
 if [ $# -lt 1 ]; then
-  echo "$(basename $0) <start|stop|restart|register> [<consul parameters>]"
+  echo "Usage: $(basename $0) <start|stop|restart|register> [<consul parameters>]
+
+       Controls Consul and Registrator containers.
+
+       start|stop|restart - control the containers
+       register - adds DNSmasq configuration to NetworkManager where all lookups to 'service.consul' domain are redirected to Consul container"
   exit 42
 fi
 
@@ -71,18 +76,17 @@ shift
 
 case $COMMAND in
 start)
-	start $@
-	;;
+  start $@
+  ;;
 stop)
-	stop
-	;;
+  stop
+  ;;
 restart)
-	stop
-	start $@
-	;;
+  stop
+  start $@
+  ;;
 register)
-	register
-	;;
+  register
+  ;;
 esac	
-
 

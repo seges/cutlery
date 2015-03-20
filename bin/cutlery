@@ -3,9 +3,9 @@
 # just a router...
 
 if [ $# -lt 1 ]; then
-	echo "$(basename $0) command"
+	echo "Usage: $(basename $0) command"
 	echo ""
-	echo "command One of ambassador, discovery, global-dns"
+	echo "command - One of ambassador, discovery, global-dns"
 	exit 42
 fi
 
