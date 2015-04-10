@@ -44,5 +44,5 @@ else
 	sudo=""
 fi
 
-$sudo $CUTLERY_HOME/bin/cutlery-$cmd $@
+$sudo OS_TYPE=$OS_TYPE $CUTLERY_HOME/bin/cutlery-$cmd $@
 
