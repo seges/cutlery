@@ -24,8 +24,12 @@ if [ "$OS_TYPE" == "DEB" ]; then
 elif [ "$OS_TYPE" == "RH" ]; then
   defaults_file="/etc/sysconfig/docker"
   defaults_var="OPTIONS"
+else
+  echo "Unidentified OS"
+  exit 42
 fi
 
+echo "Processing $defaults_var in $defaults_file"
 
 cat $defaults_file | grep '\-\-dns\ '
 if [ $? -eq 0 ]; then
