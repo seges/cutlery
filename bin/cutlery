@@ -39,10 +39,10 @@ if [ "$CUTLERY_HOME" == "" ]; then
 fi
 
 if [ "$cmd" == "global-dns" ]; then
-	sudo="sudo"
+	sudo="sudo OS_TYPE=$OS_TYPE"
 else
 	sudo=""
 fi
 
-$sudo OS_TYPE=$OS_TYPE $CUTLERY_HOME/bin/cutlery-$cmd $@
+$sudo $CUTLERY_HOME/bin/cutlery-$cmd $@
 
