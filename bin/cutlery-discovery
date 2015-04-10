@@ -55,6 +55,18 @@ function register
   IFACE="docker0"
   BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 
+  which dnsmasq
+  if [ $? -ne 0 ]; then
+    if [ "OS_TYPE" == "DEB" ]; then
+      sudo apt-get install dnsmasq
+    elif [ "OS_TYPE" == "RH" ]; then
+      sudo yum install dnsmasq
+    else
+      echo "Don't know how to install dnsmasq, try it manually"
+      exit 42
+    fi
+  fi
+
   pgrep NetworkManager
   if [ "$?" -eq 0 ]; then
     sudo sh -c "echo 'server=/service.consul/$BRIDGE_IP' > /etc/NetworkManager/dnsmasq.d/cutlery-consul.conf"
@@ -70,10 +82,10 @@ function fw
   IFACE="docker0"
   BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 
-  ufw status|grep \ active
+  sudo ufw status|grep \ active
   if [ "$?" -eq 0 ]; then
-    ufw allow proto tcp from 172.17.0.0/16 to $BRIDGE_IP/32 port 8500
-    ufw allow proto udp from 172.17.0.0/16 to $BRIDGE_IP/32 port 53
+    sudo ufw allow proto tcp from 172.17.0.0/16 to $BRIDGE_IP/32 port 8500
+    sudo ufw allow proto udp from 172.17.0.0/16 to $BRIDGE_IP/32 port 53
   fi
 }
 
@@ -104,6 +116,9 @@ restart)
   ;;
 register)
   register
+  ;;
+fw)
+  fw
   ;;
 esac	
 
