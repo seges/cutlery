@@ -18,9 +18,29 @@ IP=$(ifconfig | grep $1 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 
 echo "[setup] docker DNS = $IP"
 
-sed -i '/DOCKER_OPTS/d' /etc/default/docker
-#echo "DOCKER_OPTS=\"--dns $IP --dns 8.8.8.8 --dns-search service.consul\"" >> /etc/default/docker
-echo "DOCKER_OPTS=\"-H tcp://0.0.0.0:4243 -H unix:///var/run/docker.sock --dns $IP --dns-search service.consul\"" >> /etc/default/docker
+if [ "$OS_TYPE" == "DEB" ]; then
+  defaults_file="/etc/default/docker"
+  defaults_var="DOCKER_OPTS"
+elif [ "$OS_TYPE" == "RH" ]; then
+  defaults_file="/etc/sysconfig/docker"
+  defaults_var="OPTIONS"
+fi
+
+
+cat $defaults_file | grep '\-\-dns\ '
+if [ $? -eq 0 ]; then
+  sed -i "s/--dns\ \([^\ \"]*\)/--dns\ $IP/" $defaults_file
+else
+  sed -i "s/$defaults_var=\"/$defaults_var=\"--dns\ $IP\ /" $defaults_file
+fi
+
+cat $defaults_file | grep '\-\-dns-search\ '
+if [ $? -eq 0 ]; then
+  sed -i 's/--dns-search\ \([^\ "]*\)/--dns-search\ service.consul/' $defaults_file
+else
+  sed -i "s/$defaults_var=\"/$defaults_var=\"--dns-search\ service.consul\ /" $defaults_file
+fi
+
 
 echo "[reload] docker host"
 service docker reload
