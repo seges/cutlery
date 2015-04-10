@@ -20,10 +20,10 @@ echo "[setup] docker DNS = $IP"
 
 if [ "$OS_TYPE" == "DEB" ]; then
   defaults_file="/etc/default/docker"
-  defaults_var="DOCKER_OPTS"
+  defaults_var="DOCKER_OPTS=\""
 elif [ "$OS_TYPE" == "RH" ]; then
   defaults_file="/etc/sysconfig/docker"
-  defaults_var="OPTIONS"
+  defaults_var="OPTIONS="
 else
   echo "Unidentified OS"
   exit 42
@@ -35,14 +35,14 @@ cat $defaults_file | grep '\-\-dns\ '
 if [ $? -eq 0 ]; then
   sed -i "s/--dns\ \([^\ \"]*\)/--dns\ $IP/" $defaults_file
 else
-  sed -i "s/$defaults_var=\"/$defaults_var=\"--dns\ $IP\ /" $defaults_file
+  sed -i "s/${defaults_var}/${defaults_var}--dns\ $IP\ /" $defaults_file
 fi
 
 cat $defaults_file | grep '\-\-dns-search\ '
 if [ $? -eq 0 ]; then
   sed -i 's/--dns-search\ \([^\ "]*\)/--dns-search\ service.consul/' $defaults_file
 else
-  sed -i "s/$defaults_var=\"/$defaults_var=\"--dns-search\ service.consul\ /" $defaults_file
+  sed -i "s/${defaults_var}/${defaults_var}--dns-search\ service.consul\ /" $defaults_file
 fi
 
 
