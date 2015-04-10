@@ -70,6 +70,8 @@ function register
       echo "interface=lo" >> /etc/dnsmasq.conf
       echo "except-interface=$IFACE" >> /etc/dnsmasq.conf
       echo "bind-interfaces" >> /etc/dnsmasq.conf
+
+      service dnsmasq restart
     fi
   fi
 
