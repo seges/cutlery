@@ -65,6 +65,12 @@ function register
       echo "Don't know how to install dnsmasq, try it manually"
       exit 42
     fi
+
+    if [ -f /etc/dnsmasq.conf ]; then
+      echo "interface=lo" >> /etc/dnsmasq.conf
+      echo "except-interface=$IFACE" >> /etc/dnsmasq.conf
+      echo "bind-interfaces" >> /etc/dnsmasq.conf
+    fi
   fi
 
   pgrep NetworkManager
