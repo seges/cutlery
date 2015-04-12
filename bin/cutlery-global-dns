@@ -23,7 +23,7 @@ if [ "$OS_TYPE" == "DEB" ]; then
   defaults_var="DOCKER_OPTS=\""
 elif [ "$OS_TYPE" == "RH" ]; then
   defaults_file="/etc/sysconfig/docker"
-  defaults_var="OPTIONS="
+  defaults_var="OPTIONS='"
 else
   echo "Unidentified OS"
   exit 42
