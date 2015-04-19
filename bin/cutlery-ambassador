@@ -24,7 +24,8 @@ function start
   echo "[start] ambassador $ambassador_name"
   docker run -d \
     --name $ambassador_name \
-    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /var/run/docker.sock:/tmp/docker.sock \
+    -e DOCKER_HOST=unix:///tmp/docker.sock \
     -t progrium/ambassadord \
     --omnimode
 
@@ -36,7 +37,8 @@ function iptables_start
   echo "[start] ambassador iptables"
   docker run -d \
     --name ambassadoriptables \
-    -v /var/run/docker.sock:/var/run/docker.sock \
+    -v /var/run/docker.sock:/tmp/docker.sock \
+    -e DOCKER_HOST=unix:///tmp/docker.sock \
     --privileged \
     --net="container:$ambassador_name" \
     -t progrium/ambassadord \
