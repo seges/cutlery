@@ -61,6 +61,8 @@ function register
       sudo apt-get install dnsmasq
     elif [ "OS_TYPE" == "RH" ]; then
       sudo yum install dnsmasq
+    elif [ "OS_TYPE" == "TCE" ]; then
+      tce-load -wi dnsmasq
     else
       echo "Don't know how to install dnsmasq, try it manually"
       exit 42

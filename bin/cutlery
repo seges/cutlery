@@ -21,6 +21,9 @@ fn_distro(){
   elif [ -f /etc/redhat-release ]; then
     os=`cat /etc/redhat-release`
     OS_TYPE=RH
+  elif [ -f /etc/os-release ]; then
+    os="$(uname -s) $(uname -r)"
+    OS_TYPE=TCE 
   else
     os="$(uname -s) $(uname -r)"
     echo "Unsupported OS right now $os" 

@@ -24,6 +24,9 @@ if [ "$OS_TYPE" == "DEB" ]; then
 elif [ "$OS_TYPE" == "RH" ]; then
   defaults_file="/etc/sysconfig/docker"
   defaults_var="OPTIONS='"
+elif [ "$OS_TYPE" == "TCE" ]; then
+  defaults_file="/var/lib/boot2docker/profile"
+  defaults_var="EXTRA_ARGS='"
 else
   echo "Unidentified OS"
   exit 42
