@@ -15,6 +15,10 @@ fi
 
 #IP=$(ifconfig | grep docker0 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
 IP=$(ifconfig | grep $1 -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+if [ -z $IP ]; then
+  echo "$1 interface not active"
+  exit 42
+fi
 
 echo "[setup] docker DNS = $IP"
 
@@ -27,6 +31,11 @@ elif [ "$OS_TYPE" == "RH" ]; then
 elif [ "$OS_TYPE" == "TCE" ]; then
   defaults_file="/var/lib/boot2docker/profile"
   defaults_var="EXTRA_ARGS='"
+
+  if [[ ! -f "$defaults_file" ]]; then
+    echo "$defaults_var'" > $defaults_file
+    echo "Created defaults file $defaults_file"
+  fi
 else
   echo "Unidentified OS"
   exit 42
@@ -50,4 +59,9 @@ fi
 
 
 echo "[reload] docker host"
-service docker restart
+
+if [ "$OS_TYPE" == "TCE" ]; then
+  /etc/init.d/docker restart
+else
+  service docker restart
+fi
