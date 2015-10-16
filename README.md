@@ -67,13 +67,21 @@ Every container containing ```SERVICE_NAME``` or ```SERVICE_<exposed port>_NAME`
 
 ### Host DNS resolution
 
-There are situations (especially in development) when you want to access services from host which are registered in Consul by their appropriate DNS names (e.g. ```db.service.consul```). You have the possibility to add an entry into your host's ```/etc/hosts``` file but that is cumbersome and might contain stale data after some time. In case you are using NetworkManager, Cutlery can register route to DNSmasq to resolve all ```service.consul``` domain names to Consul container.
+There are situations (especially in development) when you want to access services from host which are registered in Consul by their appropriate DNS names (e.g. ```db.service.consul```). You have the possibility to add an entry into your host's ```/etc/hosts``` file but that is cumbersome and might contain stale data after some time. In case you are using NetworkManager or standalone DNSmasq, Cutlery can register route to DNSmasq to resolve all ```service.consul``` domain names to Consul container.
 
 ```
 cutlery discovery register
 ```
 
 The command restarts networking in order to be applied.
+
+### DNS firewall access
+
+!!! TBD
+
+```
+cutlery discovery fw
+```
 
 ## Global DNS
 
