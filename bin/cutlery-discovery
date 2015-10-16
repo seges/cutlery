@@ -4,6 +4,11 @@ function start
 {
   IFACE="docker0"
   BRIDGE_IP=$(ifconfig | grep $IFACE -A1 | tail -n1 | awk '{print $2}' | cut -f2 -d':')
+  if [ -z $BRIDGE_IP ]; then
+    echo "$IFACE not active."
+    exit 42
+  fi
+
   CONSUL_RUNLIST=$@
 
   echo "[start] consul: $CONSUL_RUNLIST, dns @ $BRIDGE_IP"
@@ -30,7 +35,7 @@ function start
     -h $HOSTNAME \
     --link="consul:consul" \
     -t progrium/registrator \
-    consul://consul:8500
+    -internal consul://consul:8500
 }
 
 function stop
