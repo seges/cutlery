@@ -22,11 +22,11 @@ function start
     -p 8302:8302/udp \
     -p 8400:8400 \
     -p 8500:8500 \
-    -p $BRIDGE_IP:53:53/udp \
+    -p $BRIDGE_IP:53:8600/udp \
     -h $HOSTNAME \
     -v /data \
-    -t progrium/consul \
-    -server $CONSUL_RUNLIST
+    -t gliderlabs/consul-server:0.6 \
+    -server -recursor "8.8.8.8" $CONSUL_RUNLIST
 
   echo "[start] registrator"
   docker run -d \
@@ -34,7 +34,7 @@ function start
     -v /var/run/docker.sock:/tmp/docker.sock \
     -h $HOSTNAME \
     --link="consul:consul" \
-    -t progrium/registrator \
+    -t gliderlabs/registrator:v6 \
     -internal consul://consul:8500
 }
 
